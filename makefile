@@ -1,7 +1,7 @@
-dev:
+devw:
 	.venv/Scripts/python.exe -m uvicorn app.main:app --host 0.0.0.0 --reload --port 8002
 
-dev-mac:
+dev:
 	.venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --reload --port 8000
 
 migrate:
