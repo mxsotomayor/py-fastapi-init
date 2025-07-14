@@ -8,7 +8,7 @@ router = APIRouter()
 
 base_path = "/callbacks"
 
-@router.post(base_path, response_model=CallbackResponse, status_code=status.HTTP_201_CREATED)
+@router.post(base_path, response_model=CallbackResponse, status_code=status.HTTP_201_CREATED, tags=["Scheduled CallBacks"])
 def submit_feedback(
     callback: CallbackCreate,
     db: Session = Depends(get_db)

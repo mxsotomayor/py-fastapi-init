@@ -8,7 +8,7 @@ router = APIRouter()
 
 base_path = "/devices"
 
-@router.post(base_path, response_model=DeviceResponse, status_code=status.HTTP_201_CREATED)
+@router.post(base_path, response_model=DeviceResponse, status_code=status.HTTP_201_CREATED, tags=["Register Devices"])
 def save_device( device: DeviceCreate, db: Session = Depends(get_db)):
     device_service = DeviceService()
     try:
