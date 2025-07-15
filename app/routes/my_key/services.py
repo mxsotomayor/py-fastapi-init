@@ -31,7 +31,12 @@ class MyKeysService:
             db.commit()
             db.refresh(new_device)
             return new_device
-
+    
+    def has_key_configured(self, db: Session, email: str) -> MyKeys:
+        my_key = db.query(MyKeys).filter(
+            MyKeys.email == email).first()
+        return my_key
+        
     def verify_key(self, db: Session, confirm_data: MyKeyConfirm) -> bool:
         my_key = db.query(MyKeys).filter(
             MyKeys.user_token == confirm_data.user_token).first()
@@ -48,7 +53,4 @@ class MyKeysService:
             
             return match
         else:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"An error occurred while processing your request"
-            )
+            return False
