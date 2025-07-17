@@ -1,6 +1,8 @@
 # --- Pydantic Schemas ---
 # Schema for incoming request data (validation)
 from datetime import datetime
+from typing import List
+from fastapi import Query
 from pydantic import BaseModel
 
 
@@ -36,3 +38,16 @@ class CallbackResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedCallbacksResponse(BaseModel):
+    items: List[CallbackResponse]
+    total: int
+    page: int
+    limit: int
+
+class Paginator:
+    def __init__(self, page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)):
+        self.page = page
+        self.limit = limit
+        self.skip = (page - 1) * limit

@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from app.models import Callback, Feedback
 from app.routes.callbacks.schemas import CallbackCreate
@@ -23,3 +24,9 @@ class CallbackService:
         db.commit()
         db.refresh(new_callback)
         return new_callback
+
+    def get_callbacks(self, db: Session, skip: int = 0, limit: int = 100) -> List[Callback]:
+        return db.query(Callback).offset(skip).limit(limit).all()
+
+    def count_callbacks(self, db: Session) -> int:
+        return db.query(Callback).count()
