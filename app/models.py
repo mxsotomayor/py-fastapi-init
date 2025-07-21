@@ -1,7 +1,7 @@
 from datetime import datetime
 import uuid
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, String, Date, Float, Integer, Double, JSON, func
+from sqlalchemy import Boolean, Column, DateTime, String, Date, Float, Integer, Double, JSON, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.ext.declarative import declarative_base
@@ -58,7 +58,17 @@ class Callback(Base):
     date_updated = Column(DateTime, nullable=False,
                           default=func.now(), onupdate=func.now())
 
+class User(Base):
+    """
+    SQLAlchemy ORM model for the 'users' table.
+    """
+    __tablename__ = "users"
 
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
+    
 class MyKeys(Base):
     """
     SQLAlchemy model for storing key-value pairs.

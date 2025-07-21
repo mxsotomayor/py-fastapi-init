@@ -10,7 +10,6 @@ router = APIRouter()
 
 base_path = "/my-keys"
 
-
 @router.post(base_path, response_model=MyKeyResponse, status_code=status.HTTP_201_CREATED, tags=["My Keys"])
 def save_key(new_key: MyKeyCreate, db: Session = Depends(get_db)):
     device_service = MyKeysService()

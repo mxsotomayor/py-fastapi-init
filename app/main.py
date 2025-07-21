@@ -10,6 +10,7 @@ from app.routes.devices.controller import router as devices_routes
 from app.routes.feedback.controller import router as feedback_routes
 from app.routes.callbacks.controller import router as callbacks_routes
 from app.routes.my_key.controller import router as my_key_routes
+from app.routes.users.controller import router as users_routes
 from app.settings import Settings
 
 setting = Settings()
@@ -79,5 +80,6 @@ app.include_router(devices_routes, prefix="/v1")
 app.include_router(callbacks_routes, prefix="/v1")
 app.include_router(feedback_routes, prefix="/v1")
 app.include_router(my_key_routes, prefix="/v1")
+app.include_router(users_routes, prefix="/v1")
 # 
 app.include_router(health_routes, prefix="/v1")
