@@ -1,9 +1,6 @@
-from datetime import datetime
-import uuid
-from pydantic import BaseModel
-from sqlalchemy import Boolean, Column, DateTime, String, Date, Float, Integer, Double, JSON, func
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import relationship
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Integer, Table, func
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -58,6 +55,28 @@ class Callback(Base):
     date_updated = Column(DateTime, nullable=False,
                           default=func.now(), onupdate=func.now())
 
+user_roles_association = Table(
+    'user_roles', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('role_id', Integer, ForeignKey('roles.id'), primary_key=True)
+)
+
+
+class Role(Base):
+    """
+    SQLAlchemy ORM model for the 'roles' table.
+    """
+    __tablename__ = "roles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    
+    name = Column(String, unique=True, index=True, nullable=False)
+    
+    # Define the reverse relationship to User (optional, but good for querying roles and seeing associated users)
+    users = relationship("User", secondary=user_roles_association, back_populates="roles")
+
+
+
 class User(Base):
     """
     SQLAlchemy ORM model for the 'users' table.
@@ -68,7 +87,14 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-    
+       # Foreign Key to roles table
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, default=1) # Default to a 'user' role_id (assuming ID 1 is 'user')
+
+    # Define the relationship to Role
+    roles = relationship("Role", secondary=user_roles_association, back_populates="users")
+
+
+
 class MyKeys(Base):
     """
     SQLAlchemy model for storing key-value pairs.

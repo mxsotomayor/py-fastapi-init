@@ -1,7 +1,8 @@
 # services.py
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.models import User 
-from app.routes.users.schemas import UserCreate
+from app.models import Role, User 
+from app.routes.users.schemas import RoleCreate, UserCreate
 from passlib.context import CryptContext # For password hashing
 
 # Initialize password hashing context
@@ -20,6 +21,38 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     return pwd_context.verify(plain_password, hashed_password)
 
+
+
+
+class RoleService:
+    """
+    Service layer for Role-related operations.
+    """
+    def get_role_by_name(self, db: Session, name: str) -> Optional[Role]:
+        return db.query(Role).filter(Role.name == name).first()
+
+    def get_role_by_id(self, db: Session, role_id: int) -> Optional[Role]:
+        return db.query(Role).filter(Role.id == role_id).first()
+
+    def get_roles_by_ids(self, db: Session, role_ids: List[int]) -> List[Role]:
+        """
+        Retrieves multiple roles by their IDs.
+        """
+        if not role_ids:
+            return []
+        return db.query(Role).filter(Role.id.in_(role_ids)).all()
+
+    def create_role(self, db: Session, role: RoleCreate) -> Role:
+        db_role = Role(name=role.name)
+        db.add(db_role)
+        db.commit()
+        db.refresh(db_role)
+        return db_role
+
+    def get_all_roles(self, db: Session) -> List[Role]:
+        return db.query(Role).all()
+
+
 class UserService:
     """
     Service layer for User-related operations.
@@ -32,7 +65,7 @@ class UserService:
         """
         return db.query(User).filter(User.email == email).first()
 
-    def create_user(self, db: Session, user: UserCreate):
+    def create_user(self, db: Session, user: UserCreate, roles: List[Role]) -> User:
         """
         Creates a new user in the database.
         Hashes the password before storing it.
@@ -42,6 +75,8 @@ class UserService:
 
         # Create a new User ORM object
         db_user = User(email=user.email, hashed_password=hashed_password)
+        
+        db_user.roles.extend(roles)
 
         # Add the user to the session
         db.add(db_user)
