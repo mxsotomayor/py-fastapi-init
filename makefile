@@ -11,3 +11,7 @@ dev:
 migrate:
 	.venv/bin/python -m alembic revision --autogenerate -m "adding roles"
 	.venv/bin/python -m alembic upgrade head
+
+build:
+	docker build --no-cache -t clobe-bff-api .
+	docker run -p 8000:8000 clobe-bff-api 

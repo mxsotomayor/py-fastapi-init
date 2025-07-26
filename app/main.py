@@ -2,6 +2,7 @@ import time
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+import uvicorn
 
 from fastapi.responses import JSONResponse
 
@@ -83,3 +84,7 @@ app.include_router(my_key_routes, prefix="/v1")
 app.include_router(users_routes, prefix="/v1")
 # 
 app.include_router(health_routes, prefix="/v1")
+
+# 👇 This allows running locally with `python app/main.py`
+if __name__ == "__main__":
+    uvicorn.run("app.app.main:app", host="0.0.0.0", port=8000)

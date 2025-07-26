@@ -1,21 +1,34 @@
-FROM python:3.12-slim-bookworm AS base
+FROM python:3.11-slim AS base
 
-FROM base AS builder
-COPY --from=ghcr.io/astral-sh/uv:0.4.9 /uv /bin/uv
-ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+# Set environment variables for production
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    POETRY_VIRTUALENVS_CREATE=false
+
 WORKDIR /app
-COPY uv.lock pyproject.toml /app/
-RUN --mount=type=cache,target=/root/.cache/uv \
-  uv sync --frozen --no-install-project --no-dev
-COPY . /app
-RUN apt-get update && apt-get install -y libpq-dev gcc
 
-RUN --mount=type=cache,target=/root/.cache/uv  uv sync --frozen --no-dev
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install pip and uvicorn-related deps
+COPY pyproject.toml .
+COPY README.md . 
+# optional if included in project
 
-FROM base
-COPY --from=builder /app /app
-ENV PATH="/app/.venv/bin:$PATH"
+RUN pip install --upgrade pip \
+    && pip install "uv[fastapi]"
+
+# Install your dependencies from pyproject.toml
+RUN pip install . --no-cache-dir
+
+# Copy the app source
+COPY . .
+
+# Expose port
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Start the FastAPI app using uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
