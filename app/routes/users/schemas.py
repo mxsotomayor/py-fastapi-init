@@ -23,9 +23,6 @@ class UserResponse(BaseModel):
     is_active: bool
 
     class Config:
-        # This tells Pydantic to read the data as an ORM model.
-        # It means Pydantic will try to read the data from a SQLAlchemy model
-        # or any other ORM, not just a dict.
         orm_mode = True
 
 
